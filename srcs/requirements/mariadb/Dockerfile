@@ -16,4 +16,4 @@ COPY ./conf/script.sh /docker-entrypoint-initdb.d/script.sh
 RUN chmod +x /docker-entrypoint-initdb.d/script.sh
 
 # Start the MariaDB server
-CMD ["mysqld"]
+CMD ["mysqld", "--bind-address=0.0.0.0"]
