@@ -1,19 +1,20 @@
-# Let's start from the debian image
+# ==> Create a container from DEBIAN
 FROM debian:buster
 
-# Install MariaDB client & server
-RUN	apt-get update
-RUN	apt-get install -y mariadb-client
-RUN	apt-get install -y mariadb-server
+# ==> MAJ of apt-get, to get the last version of packages
+RUN apt-get update && apt-get upgrade -y
 
-# Expose the 3306 port
+# ==> Install MariaDB server (MySQL)
+RUN apt-get install mariadb-server -y
+
+# ==> Copy into the container the config file of MariaDB from folder conf
+COPY conf/50-server.cnf	/etc/mysql/mariadb.conf.d/50-server.cnf
+
+# ==> Copy the bash script to create the database and the user into the container
+COPY conf/script.sh /auto_config.sh
+
+# ==> Execute the bash script to create the database and the user
+ENTRYPOINT ["bash", "auto_config.sh"]
+
+# ==> Expose the only port allowed by the subject (MySQL)
 EXPOSE 3306
-
-# Copy the script to the container
-COPY ./conf/script.sh /docker-entrypoint-initdb.d/script.sh
-
-# Add execute permission to the script
-RUN chmod +x /docker-entrypoint-initdb.d/script.sh
-
-# Start the MariaDB server
-CMD ["mysqld", "--bind-address=0.0.0.0"]

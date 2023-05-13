@@ -1,20 +1,36 @@
-#!/bin/bash
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    auto_config.sh                                     :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: rukkyaa <rukkyaa@student.42.fr>            +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2022/07/25 17:39:14 by jcluzet           #+#    #+#              #
+#    Updated: 2023/05/13 13:39:21 by rukkyaa          ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
 
-# Lire les informations de login/password à partir du fichier .env
-source .env
+#!/bin/sh
 
-# Attendre que le serveur MariaDB soit démarré
-until mysqladmin ping -h localhost --silent; do
-    sleep 1
-done
+#start my sql service
+service mysql start;
 
-# Création de la base de données pour WordPress
-mysql -h localhost -u "$DB_USERNAME" -p"$DB_PASSWORD" <<EOF
-CREATE DATABASE wordpress;
-CREATE USER '$DB_USERNAME'@'localhost' IDENTIFIED BY '$DB_PASSWORD';
-GRANT ALL PRIVILEGES ON wordpress.* TO '$DB_USERNAME'@'localhost';
-FLUSH PRIVILEGES;
-EOF
+# create a database (if the database does not exist)
+mysql -e "CREATE DATABASE IF NOT EXISTS wordpress;"
 
-# Redémarrage du serveur MariaDB
-service mysql restart
+# create an user with a password (if the user does not exist)
+mysql -e "CREATE USER IF NOT EXISTS 'admin'@'localhost' IDENTIFIED BY 'admin';"
+
+# give all privileges to the user
+mysql -e "GRANT ALL PRIVILEGES ON wordpress.* TO 'admin'@'%' IDENTIFIED BY 'admin';"
+#modify sql database
+mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED BY 'root';"
+
+#reload the database
+mysql -e "FLUSH PRIVILEGES;"
+
+#shutdown
+mysqladmin -u root -proot shutdown
+
+#use exec to 
+exec mysqld_safe
