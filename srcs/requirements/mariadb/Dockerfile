@@ -1,20 +1,18 @@
-# ==> Create a container from DEBIAN
-FROM debian:buster
+# Let's start from the debian image
+FROM	debian:buster
 
-# ==> MAJ of apt-get, to get the last version of packages
-RUN apt-get update && apt-get upgrade -y
+# Install mariadb-server
+RUN	apt-get update
+RUN	apt-get install -y mariadb-server
 
-# ==> Install MariaDB server (MySQL)
-RUN apt-get install mariadb-server -y
+# Copy the bash script to create the database and the user
+COPY	conf/script.sh /auto_config.sh
 
-# ==> Copy into the container the config file of MariaDB from folder conf
-COPY conf/50-server.cnf	/etc/mysql/mariadb.conf.d/50-server.cnf
+# Execute the bash script
+ENTRYPOINT	["bash", "auto_config.sh"]
 
-# ==> Copy the bash script to create the database and the user into the container
-COPY conf/script.sh /auto_config.sh
+# Choose the port to listen
+EXPOSE	3306
 
-# ==> Execute the bash script to create the database and the user
-ENTRYPOINT ["bash", "auto_config.sh"]
-
-# ==> Expose the only port allowed by the subject (MySQL)
-EXPOSE 3306
+# Launch the mariadb server
+CMD	["mysqld", "--bind-address=0.0.0.0"]
