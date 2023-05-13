@@ -6,7 +6,7 @@
 #    By: rukkyaa <rukkyaa@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/07/25 17:39:14 by jcluzet           #+#    #+#              #
-#    Updated: 2023/05/13 17:31:53 by rukkyaa          ###   ########.fr        #
+#    Updated: 2023/05/13 17:42:07 by rukkyaa          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -15,23 +15,23 @@
 #start my sql service
 service mysql start;
 
-# create a database (if the database does not exist)
-mysql -e "CREATE DATABASE IF NOT EXISTS wordpress;"
+# Create the database if it does not exist
+mysql -e "CREATE DATABASE IF NOT EXISTS $DB_NAME;"
 
-# create an user with a password (if the user does not exist)
-mysql -e "CREATE USER IF NOT EXISTS 'admin'@'localhost' IDENTIFIED BY 'admin';"
+# Create the user with a password if the user does not exist
+mysql -e "CREATE USER IF NOT EXISTS '$DB_USERNAME'@'localhost' IDENTIFIED BY '$DB_PASSWORD';"
 
-# give all privileges to the user
-mysql -e "GRANT ALL PRIVILEGES ON wordpress.* TO 'admin'@'%' IDENTIFIED BY 'admin';"
+# Grant all privileges to the user
+mysql -e "GRANT ALL PRIVILEGES ON $DB_NAME.* TO '$DB_USERNAME'@'%' IDENTIFIED BY '$DB_PASSWORD';"
 
-# add another user
-mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED BY 'root';"
+# Modify the root user's password
+mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '$DB_ADMIN_PASSWORD';"
 
-#reload the database
+# Reload privileges
 mysql -e "FLUSH PRIVILEGES;"
 
-#shutdown
-mysqladmin -u root -proot shutdown
+# Shutdown MySQL
+mysqladmin -u root -p"$DB_ADMIN_PASSWORD" shutdown
 
-#use exec to 
+# Start MySQL in safe mode
 exec mysqld_safe
