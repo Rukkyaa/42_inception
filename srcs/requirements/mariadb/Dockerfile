@@ -8,11 +8,14 @@ RUN apt-get update && apt-get install -y mariadb-server mariadb-client
 RUN service mysql start && mysqladmin -u root password ${DB_ADMIN_PASSWORD}
 
 # Create the database and the user
-RUN service mysql start \
-    && mysql -uroot -p${DB_ADMIN_PASSWORD} -e "CREATE DATABASE wordpress; \
-    CREATE USER '${DB_USERNAME}'@'%' IDENTIFIED BY '${DB_PASSWORD}'; \
-    GRANT ALL ON wordpress.* TO '${DB_USERNAME}'@'%'; \
-    FLUSH PRIVILEGES;"
+# RUN service mysql start \
+#     && mysql -uroot -p${DB_ADMIN_PASSWORD} -e "CREATE DATABASE wordpress; \
+#     CREATE USER '${DB_USERNAME}'@'%' IDENTIFIED BY '${DB_PASSWORD}'; \
+#     GRANT ALL ON wordpress.* TO '${DB_USERNAME}'@'%'; \
+#     FLUSH PRIVILEGES;"
+COPY script.sh ./
+RUN chmod +x script.sh
+RUN ./script.sh
 
 # Choose the port to listen
 EXPOSE 3306
