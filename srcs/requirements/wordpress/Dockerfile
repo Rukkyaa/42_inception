@@ -27,6 +27,7 @@ RUN mv wp-cli.phar /usr/local/bin/wp
 
 # Copy the script to start the services
 COPY	conf/wordpress.sh /wordpress.sh
+RUN		chmod +x wordpress.sh
 
 # Expose the port 9000
 EXPOSE	9000
