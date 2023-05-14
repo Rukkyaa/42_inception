@@ -1,18 +1,15 @@
-# Let's start from the debian image
-FROM	debian:buster
+FROM debian:buster
 
-# Install mariadb-server
-RUN	apt-get update
-RUN	apt-get install -y mariadb-server
+RUN apt-get update && apt-get install -y mariadb-server mariadb-client
 
-# Copy the bash script to create the database and the user
-COPY	conf/script.sh /script.sh
+RUN service mysql start && mysqladmin -u root password ${DB_ADMIN_PASSWORD}
 
-# Execute the bash script
-ENTRYPOINT	["bash", "script.sh"]
+RUN service mysql start \
+    && mysql -uroot -p${DB_ADMIN_PASSWORD} -e "CREATE DATABASE wordpress; \
+    CREATE USER '${DB_USERNAME}'@'%' IDENTIFIED BY '${DB_PASSWORD}'; \
+    GRANT ALL ON wordpress.* TO '${DB_USERNAME}'@'%'; \
+    FLUSH PRIVILEGES;"
 
-# Choose the port to listen
-EXPOSE	3306
+EXPOSE 3306
 
-# Launch the mariadb server
-CMD	["mysqld", "--bind-address=0.0.0.0"]
+CMD ["mysqld", "--bind-address=0.0.0.0"]
