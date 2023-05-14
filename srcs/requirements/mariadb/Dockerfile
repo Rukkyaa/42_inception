@@ -4,11 +4,15 @@ FROM debian:buster
 # Install mariadb
 RUN apt-get update && apt-get install -y mariadb-server mariadb-client
 
-RUN service mysql start && mysqladmin -u root password inception_admin_password
+ARG DB_ADMIN_PASSWORD
+ARG DB_USERNAME
+ARG DB_PASSWORD
+
+RUN service mysql start && mysqladmin -u root password ${DB_ADMIN_PASSWORD}
 RUN service mysql start \
-    && mysql -uroot -pinception_admin_password -e "CREATE DATABASE wordpress; \
-    CREATE USER 'inception_user'@'%' IDENTIFIED BY 'inception_user_password'; \
-    GRANT ALL ON wordpress.* TO 'inception_user'@'%'; \
+    && mysql -uroot -p${DB_ADMIN_PASSWORD} -e "CREATE DATABASE wordpress; \
+    CREATE USER '${DB_USERNAME}'@'%' IDENTIFIED BY '${DB_PASSWORD}'; \
+    GRANT ALL ON wordpress.* TO '${DB_USERNAME}'@'%'; \
     FLUSH PRIVILEGES;"
 
 RUN service mysql restart
