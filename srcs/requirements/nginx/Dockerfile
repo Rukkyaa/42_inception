@@ -14,7 +14,7 @@ RUN	openssl req -newkey rsa:4096 -x509 -sha256 -days 365 -nodes \
        -subj "/C=FR/ST=Paris/L=Paris/O=42 School/OU=axlamber/CN=axlamber/"
 
 # Config
-COPY	./conf/nginx.conf /etc/nginx/conf.d/default.conf
+COPY	./conf/nginx.conf /etc/nginx/conf.d/nginx.conf
 # COPY	index.html /var/www/html/
 
 # Create a run file to stock the temporary files from nginx
